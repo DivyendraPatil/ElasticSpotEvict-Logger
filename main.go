@@ -44,23 +44,28 @@ func HandleLambdaEvent(ctx context.Context, eventInfo spotEventRecord) {
 	// get credential from ssm
 	mySession := session.Must(session.NewSession())
 	svc := ssm.New(mySession, aws.NewConfig().WithRegion("us-east-1"))
-	sessionInput := ssm.GetParameterInput{}
-	sessionInput.SetName("tf-spotevictioneventLambda-username")
-	usernameOutput, err := svc.GetParameter(&sessionInput)
-	if err != nil {
-		log.Fatalf("Error getting username from SSM: %s", err)
-	}
-	username := *(usernameOutput.Parameter).Value
 
-	sessionInput.SetName("tf-spotevictioneventLambda-password")
-	passwordOutput, err := svc.GetParameter(&sessionInput)
-	if err != nil {
-		log.Fatalf("Error getting password from SSM: %s", err)
+	var username, password string
+	params := []string{"tf-spotevictioneventLambda-username", "tf-spotevictioneventLambda-password"}
+
+	for _, param := range params {
+		sessionInput := ssm.GetParameterInput{}
+		sessionInput.SetName(param)
+		paramOutput, err := svc.GetParameter(&sessionInput)
+
+		if err != nil {
+			log.Fatalf("Error getting %s from SSM: %s", param, err)
+		}
+
+		switch param {
+		case "tf-spotevictioneventLambda-username":
+			username = *(paramOutput.Parameter).Value
+		case "tf-spotevictioneventLambda-password":
+			password = *(paramOutput.Parameter).Value
+		}
 	}
-	password := *(passwordOutput.Parameter).Value
 
 	cfg := elasticsearch.Config{
-		// ...
 		Username: username,
 		Password: password,
 		Addresses: []string{
