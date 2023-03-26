@@ -3,6 +3,8 @@ Lambda for Logging Spot Instance Evictions to Elasticsearch
 
 This is a Golang code snippet that provides a lambda function that logs spot instance evictions to Elasticsearch. Amazon sends a 2-minute termination notice before a spot instance is taken away. This lambda function provides visibility into the logs for the same by logging the event details to Elasticsearch.
 
+![img](https://github.com/DivyendraPatil/ElasticSpotEvict-Logger/blob/main/log_img.png?raw=true)
+
 ## Usage
 
 This code can be used as a standalone lambda function or integrated into an existing AWS infrastructure.
